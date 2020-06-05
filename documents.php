@@ -1,9 +1,6 @@
 <?php
     // error_reporting(E_ERROR | E_PARSE);
-    if(!isset($db)) {
-        $db = array();
-    }
-
+    
     if(isset($_GET['call'])) {
 
         switch($_GET['call']) {
