@@ -9,11 +9,7 @@ import Paatosvaltaisuus from '../../Components/UusiKokous/Paatosvaltaisuus'
 import Yhteenveto from '../../Components/UusiKokous/Yhteenveto'
 import { getSessionRole, getUser } from '../../Components/Auth/Sessions'
 import Esityslista from '../../Components/UusiKokous/Esityslista';
-/*
 
-Refresh hukkaa tiedot --- joku getti? 
-
-*/
 const UusiKokous = () => {
 
     let user = getUser()
@@ -23,7 +19,6 @@ const UusiKokous = () => {
     const [showComponent, setShowComponent] = useState('perustiedot')
     let history = useHistory()
 
-    // const [kokousid, setKokousid] = useState(null)
     const [perustiedot, setPerustiedot] = useState({ otsikko: '', kokousNro: null, kokousid: '', startDate: '', endDate: '', avoinna: false })
     const [esityslista, setEsityslista] = useState()
     const [osallistujat, setOsallistujat] = useState()
@@ -44,16 +39,21 @@ const UusiKokous = () => {
 
                 if (res.data.message !== 'Ei kesken olevia kokouskutsuja') {
                     if (window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) {
-                        console.log('res.data -- getDRAFT', res.data)
+                 
+                        const avoin = res.data.avoinna === "0" ? false : true
+                        const alkaa = res.data.startDate === "1970-01-01" ? null: new Date(res.data.startDate)
+                        const loppuu = res.data.endDate === "1970-01-01" ? null: new Date(res.data.endDate)
+
+                        console.log('res.data.startDate', res.data.startDate)
                         setPerustiedot({
                             otsikko: res.data.otsikko,
                             kokousNro: res.data.kokousnro + "/" + (new Date(now)).toLocaleDateString('fi-FI', pvmYear),
                             kokousid: res.data.id,
-                            startDate: new Date(res.data.startDate),
-                            endDate: new Date(res.data.endDate),
-                            avoinna: res.data.avoinna
+                            startDate: alkaa,
+                            endDate: loppuu,
+                            avoinna: avoin
                         })
-                      
+
                         const esitys = res.data.pv_esityslista === "0" ? '' : res.data.pv_esityslista
                         const aktiv = res.data.pv_aktiivisuus === "0" ? '' : res.data.pv_aktiivisuus
                         const kesto = res.data.pv_kesto === "0" ? '' : res.data.pv_kesto
@@ -98,9 +98,8 @@ const UusiKokous = () => {
                 setOsallistujat(res.data.filter(x => x.email !== getUser().email))
                 setPuheenjohtaja(res.data.filter(x => x.email === getUser().email))
             }).catch(err => console.log('err.response', err.response))
-        }
-
-    }, [members, perustiedot, yhdistys])
+        }                                    
+    }, [members, perustiedot, yhdistys])  // missing dependencies, mutta seurauksena looppi ... refaktoroi 
 
     const helpText = "Aloita kokous antamalla sille otsikko sekä alku- ja loppupäivämäärät. Kun olet valmis, paina seuraava-näppäintä, niin voit luoda esityslistan ja päättää voiko yhdistyksen jäsenet liittää omia esityksiään esityslistalle. Seuraavaksi voit määritellä kokouksen osallistujat ja päätösvaltaisuuden. Lopuksi näet kutsu kokous -välilehdeltä luomasi kokouksen tiedot, missä voit tallentaa ja lähettää kutsun kokoukseen osallistujille."
 
@@ -120,7 +119,6 @@ const UusiKokous = () => {
     }
     const saveKokousDraft = () => {
 
-        const avoin = paatosvaltaisuus.avoinna ? "true" : "false"
         const uusiKokous = JSON.stringify({
             call: 'luokokous',
             id_y: id_y,
@@ -129,7 +127,7 @@ const UusiKokous = () => {
             kokousnro: perustiedot.kokousNro.substring(0, perustiedot.kokousNro.length - 5),
             startDate: perustiedot.startDate,
             endDate: perustiedot.endDate,
-            avoinna: avoin,
+            avoinna: perustiedot.avoinna,
             paatosvaltaisuus: paatosvaltaisuus,
             valmis: false
         })
