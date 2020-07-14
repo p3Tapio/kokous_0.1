@@ -41,8 +41,8 @@ const UusiKokous = () => {
                     if (window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) {
                  
                         const avoin = res.data.avoinna === "0" ? false : true
-                        const alkaa = res.data.startDate === "1970-01-01" ? null: new Date(res.data.startDate)
-                        const loppuu = res.data.endDate === "1970-01-01" ? null: new Date(res.data.endDate)
+                        const alkaa = res.data.startDate === "1970-01-01" ? '': new Date(res.data.startDate)    // null sotkee bäkin puolella koska isset
+                        const loppuu = res.data.endDate === "1970-01-01" ? '': new Date(res.data.endDate)
 
                         console.log('res.data.startDate', res.data.startDate)
                         setPerustiedot({
@@ -131,8 +131,9 @@ const UusiKokous = () => {
             paatosvaltaisuus: paatosvaltaisuus,
             valmis: false
         })
-
+        console.log('uusiKokous', uusiKokous)
         request.kokous(uusiKokous).then(res => {
+            console.log('res.data ---- uusiKok', res.data)
             setPerustiedot({ ...perustiedot, kokousid: res.data.kokousid })
             saveOsallistujat()
         }).catch(err => {
