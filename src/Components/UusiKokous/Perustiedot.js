@@ -1,24 +1,18 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import request from '../Shared/HttpRequests'
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import fi from 'date-fns/locale/fi';
 
 
-const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys }) => {
+const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, kysy, setKysy }) => {
 
     registerLocale('fi', fi)
     let avoin
     const pvmYear = { year: 'numeric' };
     const now = Date();
 
-    useEffect(() => {
-        if (perustiedot) {
-            if (perustiedot.id && !window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) clearPerustiedot()
-        } else clearPerustiedot()
-    }, [])
-  
-    const clearPerustiedot = () => {
+    const startNewKokouskutsu = () => {
         const getnro = JSON.stringify({ call: 'kokousnro', yhdistys: yhdistys })
         request.kokous(getnro).then(res => {
             setPerustiedot({ id: '', otsikko: '', kokousnro: res.data.kokousnro + "/" + (new Date(now)).toLocaleDateString('fi-FI', pvmYear), startDate: '', endDate: '', avoinna: false })
@@ -28,6 +22,12 @@ const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys }
         if (ev.target.name === 'otsikko') setPerustiedot({ ...perustiedot, otsikko: ev.target.value })
         else if (ev.target.name === 'kokousnro') setPerustiedot({ ...perustiedot, kokousNro: ev.target.value })
         else if (ev.target.id === 'avaa') setPerustiedot({ ...perustiedot, avoinna: !perustiedot.avoinna })
+    }
+    if (kysy) {
+        if (perustiedot) {
+            if (perustiedot.id && !window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) startNewKokouskutsu()
+        } else startNewKokouskutsu()
+        setKysy(false)
     }
 
     if (perustiedot && perustiedot.kokousnro) {
@@ -43,7 +43,7 @@ const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys }
                     </div>
                     <div className="form-group">
                         <label>Kokouksen numero</label>
-                        <input type="text" className="form-control" name="kokousnro" onChange={handlePerustiedotChange} value={perustiedot.kokousro || ''} />
+                        <input type="text" className="form-control" name="kokousnro" onChange={handlePerustiedotChange} value={perustiedot.kokousnro || ''} />
                     </div>
                     <div className="form-group">
                         <label>Kokous alkaa</label><br />

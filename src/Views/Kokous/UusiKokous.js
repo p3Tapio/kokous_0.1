@@ -4,7 +4,7 @@ import { useParams, useHistory, Link } from 'react-router-dom'
 import request from '../../Components/Shared/HttpRequests'
 import HelpPop from '../../Components/Shared/HelpPop'
 import Perustiedot from '../../Components/UusiKokous/Perustiedot'
-
+import Osallistujat from '../../Components/UusiKokous/Osallistujat'
 
 const UusiKokous = () => {
 
@@ -12,13 +12,14 @@ const UusiKokous = () => {
     const { yhdistys } = useParams()
     let history = useHistory()
     const helpText = "Aloita kokous antamalla sille otsikko sekä alku- ja loppupäivämäärät. Kun olet valmis, paina seuraava-näppäintä, niin voit luoda esityslistan ja päättää voiko yhdistyksen jäsenet liittää omia esityksiään esityslistalle. Seuraavaksi voit määritellä kokouksen osallistujat ja päätösvaltaisuuden. Lopuksi näet kutsu kokous -välilehdeltä luomasi kokouksen tiedot, missä voit tallentaa ja lähettää kutsun kokoukseen osallistujille."
-    const pvmYear = { year: 'numeric' };
-    const now = Date();
+    const [kysy, setKysy] = useState(true) 
 
     const [showComponent, setShowComponent] = useState()
     const [perustiedot, setPerustiedot] = useState()
 
     useEffect(() => {
+        const now = Date();
+        const pvmYear = { year: 'numeric' };
         const getdraft = JSON.stringify({ call: 'getkokousdraft', name: yhdistys })
         request.kokous(getdraft).then(res => {
             if (res.data.id) {
@@ -36,17 +37,17 @@ const UusiKokous = () => {
             } else setPerustiedot('ei kesken olevia')
             setShowComponent('perustiedot')
         }).catch(err => console.log('err.data', err.data))
-     
     }, [yhdistys])
-
+    
 
     const handleMenuClick = (ev) => {
         setShowComponent(ev.target.name)
     }
     let component
-    if (showComponent === 'perustiedot') component = <Perustiedot setShowComponent={setShowComponent} perustiedot={perustiedot} setPerustiedot={setPerustiedot} yhdistys={yhdistys} />
+    if (showComponent === 'perustiedot') component = <Perustiedot setShowComponent={setShowComponent} perustiedot={perustiedot} setPerustiedot={setPerustiedot} yhdistys={yhdistys} kysy={kysy} setKysy={setKysy} />
     // else if (showComponent === 'esityslista') component = <Esityslista setShowComponent={setShowComponent} setEsityslista={setEsityslista} esityslista={esityslista} />
-    // else if (showComponent === 'osallistujat') component = <Osallistujat puheenjohtaja={puheenjohtaja} osallistujat={osallistujat} setOsallistujat={setOsallistujat} saveOsallistujat={saveOsallistujat} varalla={varalla} setVaralla={setVaralla} setShowComponent={setShowComponent} />
+    else if (showComponent === 'osallistujat') component = <Osallistujat setShowComponent={setShowComponent} />
+    // puheenjohtaja={puheenjohtaja} osallistujat={osallistujat} setOsallistujat={setOsallistujat} saveOsallistujat={saveOsallistujat} varalla={varalla} setVaralla={setVaralla} 
     // else if (showComponent === 'paatosvaltaisuus') component = <Paatosvaltaisuus setShowComponent={setShowComponent} handlePaatosvaltaChange={handlePaatosvaltaChange} paatosvaltaisuus={paatosvaltaisuus} saveKokousDraft={saveKokousDraft} />
     // else if (showComponent === 'yhteenveto') component = <Yhteenveto perustiedot={perustiedot} osallistujat={osallistujat} paatosvaltaisuus={paatosvaltaisuus} yhdistys={yhdistys} id_y={id_y} />
     else component = <></>
