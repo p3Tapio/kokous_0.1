@@ -29,8 +29,8 @@ const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, 
                 if (!window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) startNewKokouskutsu()
             } else startNewKokouskutsu()
             setKysy(false)
-        }
-    }
+        } 
+    } 
 
     if (perustiedot && perustiedot.kokousnro) {
         avoin = perustiedot.avoinna ? "Avoinna" : "Kiinni"
