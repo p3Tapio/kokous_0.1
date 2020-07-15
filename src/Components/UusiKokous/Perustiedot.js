@@ -6,7 +6,7 @@ import fi from 'date-fns/locale/fi';
 
 
 const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, kysy, setKysy }) => {
-
+    console.log('perustiedot', perustiedot)
     registerLocale('fi', fi)
     let avoin
     const pvmYear = { year: 'numeric' };
@@ -25,14 +25,15 @@ const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, 
     }
     if (kysy) {
         if (perustiedot) {
-            if (perustiedot.id && !window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) startNewKokouskutsu()
-        } else startNewKokouskutsu()
-        setKysy(false)
+            if (perustiedot.id) {
+                if (!window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) startNewKokouskutsu()
+            } else startNewKokouskutsu()
+            setKysy(false)
+        }
     }
 
     if (perustiedot && perustiedot.kokousnro) {
         avoin = perustiedot.avoinna ? "Avoinna" : "Kiinni"
-        console.log('perustiedot', perustiedot)
         return (
             <div className="col-md-6  m-auto">
                 <h5 className="mb-4">Kokouksen perustiedot</h5>
