@@ -4,33 +4,18 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import fi from 'date-fns/locale/fi';
 
-
 const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, kysy, setKysy }) => {
-    console.log('perustiedot', perustiedot)
+    
     registerLocale('fi', fi)
     let avoin
     const pvmYear = { year: 'numeric' };
     const now = Date();
 
-    const startNewKokouskutsu = () => {
-        const getnro = JSON.stringify({ call: 'kokousnro', yhdistys: yhdistys })
-        request.kokous(getnro).then(res => {
-            setPerustiedot({ id: '', otsikko: '', kokousnro: res.data.kokousnro + "/" + (new Date(now)).toLocaleDateString('fi-FI', pvmYear), startDate: '', endDate: '', avoinna: false })
-        }).catch(err => console.log('kokousnro - error:', err.data))
-    }
     const handlePerustiedotChange = (ev) => {
         if (ev.target.name === 'otsikko') setPerustiedot({ ...perustiedot, otsikko: ev.target.value })
         else if (ev.target.name === 'kokousnro') setPerustiedot({ ...perustiedot, kokousNro: ev.target.value })
         else if (ev.target.id === 'avaa') setPerustiedot({ ...perustiedot, avoinna: !perustiedot.avoinna })
     }
-    if (kysy) {
-        if (perustiedot) {
-            if (perustiedot.id) {
-                if (!window.confirm('Yhdistyksellä on tallentamaton kokous. Haluatko jatkaa kokoustietojen täyttämistä vai aloittaa uudelleen?')) startNewKokouskutsu()
-            } else startNewKokouskutsu()
-            setKysy(false)
-        } 
-    } 
 
     if (perustiedot && perustiedot.kokousnro) {
         avoin = perustiedot.avoinna ? "Avoinna" : "Kiinni"
@@ -85,7 +70,7 @@ const Perustiedot = ({ perustiedot, setPerustiedot, setShowComponent, yhdistys, 
                 <hr />
             </div>
         )
-    } else return <p>Loading....</p>
+    } else return <p>Loading....perustiedot</p>
 
 }
 export default Perustiedot
